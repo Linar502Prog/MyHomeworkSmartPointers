@@ -10,7 +10,17 @@ public:
 		__m_ptr = ptr;
 	};
 	my_unique_ptr(const my_unique_ptr&) = delete;
-	T& operator*() { return *__m_ptr; }
+	T& operator*() {
+		if (__m_ptr != nullptr) {
+			return *__m_ptr;
+		}
+		else {
+			throw std::invalid_argument("null pointer dereference");
+		}
+	}
+	T* operator->() {
+		return __m_ptr;
+	}
 	my_unique_ptr& operator=(const my_unique_ptr&) = delete;
 
 	T* release() {
@@ -25,10 +35,15 @@ public:
 
 int main() {
 	my_unique_ptr<int> ptr(new int(10));
-	std::cout << *ptr << std::endl;
-	auto* P = ptr.release();
-	std::cout << *P << std::endl;
-	delete P;
+	try {
+		std::cout << *ptr << std::endl;
+		auto* P = ptr.release();
+		std::cout << *P << std::endl;
+		delete P;
+	}
+	catch (const std::invalid_argument& err) {
+		std::cout << err.what();
+	}
 
 	return EXIT_SUCCESS;
 }
